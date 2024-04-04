@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "373028769617",
+    "project_id": "ct484-project-photos-share",
+    "storage_bucket": "ct484-project-photos-share.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:373028769617:android:4642ab3b5252b34e2a8d70",
+        "android_client_info": {
+          "package_name": "com.example.ct484_project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "373028769617-vcc4bhb5mi0uhttr4kfa44iubddom2hs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALQP4ECi0Ku-7tytXdWPpfpfhqPw1Umfo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "373028769617-vcc4bhb5mi0uhttr4kfa44iubddom2hs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
