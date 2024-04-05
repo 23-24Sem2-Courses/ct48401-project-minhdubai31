@@ -10,6 +10,7 @@ class OauthButton extends StatelessWidget {
     required this.textColor,
     this.overlayColor,
     this.borderColor,
+    this.isLoading = false,
   });
   final String text;
   final VoidCallback onTap;
@@ -18,6 +19,7 @@ class OauthButton extends StatelessWidget {
   final Color buttonColor;
   Color? overlayColor;
   Color? borderColor;
+  bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,7 @@ class OauthButton extends StatelessWidget {
             buttonColor,
           ),
           minimumSize: MaterialStateProperty.all<Size>(
-            const Size(150, 50),
+            const Size(150, 45),
           ),
           shape: MaterialStateProperty.all<OutlinedBorder>(
             RoundedRectangleBorder(
@@ -47,20 +49,27 @@ class OauthButton extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image(
-                image: AssetImage(imageAsset),
-                height: 20,
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Text(
-                text,
-                style: TextStyle(
-                  color: textColor,
-                  fontSize: 16
-                ),
-              )
+              !isLoading
+                  ? Row(
+                      children: [
+                        Image(
+                          image: AssetImage(imageAsset),
+                          height: 20,
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          text,
+                          style: TextStyle(color: textColor, fontSize: 16),
+                        ),
+                      ],
+                    )
+                  : SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: const CircularProgressIndicator(),
+                    ),
             ],
           ),
         ));

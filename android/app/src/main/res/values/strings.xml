@@ -1,4 +1,5 @@
 <resources>
     <string name="facebook_app_id">1722968584779424</string>
     <string name="facebook_client_token">e176b91466928648cb81b2f3d997ee1a</string>
+    <string name="default_web_client_id">373028769617-vcc4bhb5mi0uhttr4kfa44iubddom2hs.apps.googleusercontent.com</string>
 </resources>
