@@ -66,7 +66,7 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text("Back to login"))
+                    child: const Text("Back to login"))
               ],
             ),
           ),

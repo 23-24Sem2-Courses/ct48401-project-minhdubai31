@@ -24,10 +24,15 @@ class FirebaseAuthService {
       );
 
       showFlushbar(
-        context: context,
-        message: 'Account created successfully',
-        color: Theme.of(context).primaryColor
-      );
+          context: context,
+          message: 'Account created successfully',
+          color: Theme.of(context).primaryColor);
+
+      // Auto sign in and go back to Home screen
+      await signInWithEmailPassword(
+          email: email, password: password, context: context);
+
+      Navigator.of(context).popUntil((route) => route.isFirst);
     } on FirebaseAuthException catch (e) {
       showFlushbar(
         context: context,
@@ -89,20 +94,23 @@ class FirebaseAuthService {
 
   Future<void> signInWithGoogle(BuildContext context) async {
     try {
+      FocusScope.of(context).unfocus();
+
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
       final GoogleSignInAuthentication? googleAuth =
           await googleUser?.authentication;
 
-      // if (googleAuth?.accessToken != null && googleAuth?.idToken != null) {
-      // Create a new credential
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth?.accessToken,
-        idToken: googleAuth?.idToken!,
-      );
+      if (googleAuth?.accessToken != null && googleAuth?.idToken != null) {
+        // Create a new credential
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth?.accessToken,
+          idToken: googleAuth?.idToken!,
+        );
 
-      await _auth.signInWithCredential(credential);
-      // }
+        await _auth.signInWithCredential(credential);
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
     } on FirebaseAuthException catch (error) {
       showFlushbar(
         context: context,
@@ -118,6 +126,8 @@ class FirebaseAuthService {
 
   Future<void> signInWithFacebook(BuildContext context) async {
     try {
+      FocusScope.of(context).unfocus();
+
       // Trigger the sign-in flow
       final LoginResult loginResult = await FacebookAuth.instance.login();
 
@@ -128,6 +138,7 @@ class FirebaseAuthService {
 
         // Once signed in, return the UserCredential
         FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
+        Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } on FirebaseAuthException catch (error) {
       showFlushbar(

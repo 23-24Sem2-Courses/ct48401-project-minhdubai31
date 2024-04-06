@@ -59,16 +59,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: SingleChildScrollView(
-            reverse: true,
-            child: Column(
+    return Opacity(
+      opacity: _isGoogleSignInLoading || _isFacebookSignInLoading ? 0.8 : 1,
+      child: Scaffold(
+        body: SafeArea(
+          child: Center(
+            child: ListView(
+              shrinkWrap: true,
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
               children: [
                 const SizedBox(
-                  height: 160,
+                  height: 8,
                 ),
                 const WelcomeHeader(),
                 const SizedBox(
@@ -97,10 +98,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: const Text("Forgot password?"),
                   ),
                 ),
-                CustomButton(
-                  onTap: login,
-                  text: "Login",
-                  isLoading: _isEmailPasswordSignInLoading,
+                Align(
+                  child: CustomButton(
+                    onTap: login,
+                    text: "Login",
+                    isLoading: _isEmailPasswordSignInLoading,
+                  ),
                 ),
                 const SizedBox(
                   height: 8,
@@ -110,30 +113,35 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     color: Color.fromRGBO(0, 0, 0, 0.4),
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(
                   height: 8,
                 ),
-                OauthButton(
-                  onTap: loginWithGoogle,
-                  text: "Continue with Google",
-                  imageAsset: 'assets/logo_google.png',
-                  buttonColor: Colors.white,
-                  textColor: Colors.black,
-                  borderColor: const Color.fromRGBO(0, 0, 0, 0.2),
-                  overlayColor: Theme.of(context).hoverColor,
-                  isLoading: _isGoogleSignInLoading,
+                Align(
+                  child: OauthButton(
+                    onTap: loginWithGoogle,
+                    text: "Continue with Google",
+                    imageAsset: 'assets/logo_google.png',
+                    buttonColor: Colors.white,
+                    textColor: Colors.black,
+                    borderColor: const Color.fromRGBO(0, 0, 0, 0.2),
+                    overlayColor: Theme.of(context).hoverColor,
+                    isLoading: _isGoogleSignInLoading,
+                  ),
                 ),
                 const SizedBox(
                   height: 5,
                 ),
-                OauthButton(
-                  onTap: loginWithFacebook,
-                  text: "Continue with Facebook",
-                  imageAsset: 'assets/logo_facebook.png',
-                  buttonColor: const Color(0xff0863f7),
-                  textColor: Colors.white,
-                  isLoading: _isFacebookSignInLoading,
+                Align(
+                  child: OauthButton(
+                    onTap: loginWithFacebook,
+                    text: "Continue with Facebook",
+                    imageAsset: 'assets/logo_facebook.png',
+                    buttonColor: const Color(0xff0863f7),
+                    textColor: Colors.white,
+                    isLoading: _isFacebookSignInLoading,
+                  ),
                 ),
                 const SizedBox(
                   height: 5,

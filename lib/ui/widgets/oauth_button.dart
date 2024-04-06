@@ -65,10 +65,10 @@ class OauthButton extends StatelessWidget {
                         ),
                       ],
                     )
-                  : SizedBox(
+                  : const SizedBox(
                       width: 20,
                       height: 20,
-                      child: const CircularProgressIndicator(),
+                      child: CircularProgressIndicator(),
                     ),
             ],
           ),
