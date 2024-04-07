@@ -1,37 +1,35 @@
-import 'package:ct484_project/models/user.dart';
-
 class Post {
   final String id;
-  final User owner;
+  final String ownerUserId;
   final String caption;
   final String totalLike;
   final String imageUrl;
-  final List<User> likes;
+  final List<String> likesUserIdList;
 
   Post({
     required this.id,
-    required this.owner,
+    required this.ownerUserId,
     required this.caption,
     required this.totalLike,
     required this.imageUrl,
-    required this.likes,
+    required this.likesUserIdList,
   });
 
   Post copyWith({
     String? id,
-    User? owner,
+    String? ownerUserId,
     String? caption,
     String? totalLike,
     String? imageUrl,
-    List<User>? likes,
+    List<String>? likesUserIdList,
   }) {
     return Post(
       id: id ?? this.id,
-      owner: owner ?? this.owner,
+      ownerUserId: ownerUserId ?? this.ownerUserId,
       caption: caption ?? this.caption,
       totalLike: totalLike ?? this.totalLike,
       imageUrl: imageUrl ?? this.imageUrl,
-      likes: likes ?? this.likes,
+      likesUserIdList: likesUserIdList ?? this.likesUserIdList,
     );
   }
 }

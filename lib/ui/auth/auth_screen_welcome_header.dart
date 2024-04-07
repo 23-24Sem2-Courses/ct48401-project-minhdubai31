@@ -27,7 +27,7 @@ class WelcomeHeader extends StatelessWidget {
             fontSize: 24,
             fontWeight: FontWeight.w900,
           ),
-        )
+        ),
       ],
     );
   }

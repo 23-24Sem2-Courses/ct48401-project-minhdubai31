@@ -39,16 +39,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Photos Share',
         debugShowCheckedModeBanner: false,
-        themeMode: ThemeMode.system,
         theme: ThemeData(
           colorScheme:
               FlexColorScheme.light(scheme: FlexScheme.aquaBlue).toScheme,
-          textTheme: GoogleFonts.robotoFlexTextTheme(),
-          useMaterial3: true,
-        ),
-        darkTheme: ThemeData(
-          colorScheme:
-              FlexColorScheme.dark(scheme: FlexScheme.aquaBlue).toScheme,
           textTheme: GoogleFonts.robotoFlexTextTheme(),
           useMaterial3: true,
         ),

@@ -59,10 +59,11 @@ class FirebaseAuthService {
 
   Future<void> signOut({required BuildContext context}) async {
     try {
+      await _auth.signOut();
+      
       if (_auth.currentUser?.providerData[0].providerId == 'google.com') {
         await GoogleSignIn().disconnect();
       }
-      await _auth.signOut();
     } on FirebaseAuthException catch (error) {
       showFlushbar(
         context: context,
