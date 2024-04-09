@@ -25,6 +25,8 @@ dependencies:
     flutter_facebook_auth: ^6.2.0
     ionicons: ^0.2.2
     image_picker: ^1.0.7
+    cloud_firestore: ^4.15.8
+    firebase_storage: ^11.7.0
 
 dev_dependencies:
     flutter_test:

@@ -1,11 +1,39 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:ct484_project/models/user.dart';
+import 'package:ct484_project/services/user_service.dart';
 import 'package:ct484_project/ui/utils/show_flushbar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
+Future<void> createUserDatabaseIfNewUser(UserCredential userCredential, [String? name, String? email]) async {
+  if (userCredential.user != null) {
+    bool isNewUser = userCredential.additionalUserInfo!.isNewUser;
+    final userDetails = userCredential.additionalUserInfo!.profile;
+    final providerId = userCredential.additionalUserInfo?.providerId;
+
+    String avatar = "";
+    switch(providerId) {
+      case "facebook.com": avatar = userDetails?["picture"]["data"]["url"];
+      case "google.com": avatar = userDetails?["picture"];
+    }
+
+    if (isNewUser) {
+      UserService().addUser(
+        User(
+          name: name ?? userDetails?["name"],
+          email: email ?? userDetails?["email"],
+          avatarUrl: avatar,
+          postsId: [],
+        ),
+        userCredential.user!.uid
+      );
+    }
+  }
+}
 
 class FirebaseAuthService {
   final FirebaseAuth _auth;
@@ -13,15 +41,19 @@ class FirebaseAuthService {
   FirebaseAuthService(this._auth);
 
   Future<void> signUpWithEmailPassword({
+    required String name,
     required String email,
     required String password,
     required BuildContext context,
   }) async {
     try {
-      await _auth.createUserWithEmailAndPassword(
+      final UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
+
+      createUserDatabaseIfNewUser(userCredential, name, email);
 
       showFlushbar(
           context: context,
@@ -59,11 +91,12 @@ class FirebaseAuthService {
 
   Future<void> signOut({required BuildContext context}) async {
     try {
-      await _auth.signOut();
-      
+      // TO MAKE SURE SHOW SELECT USER WHILE LOGIN WITH GOOGLE
       if (_auth.currentUser?.providerData[0].providerId == 'google.com') {
         await GoogleSignIn().disconnect();
       }
+
+      await _auth.signOut();
     } on FirebaseAuthException catch (error) {
       showFlushbar(
         context: context,
@@ -109,7 +142,11 @@ class FirebaseAuthService {
           idToken: googleAuth?.idToken!,
         );
 
-        await _auth.signInWithCredential(credential);
+        final UserCredential userCredential =
+            await _auth.signInWithCredential(credential);
+
+        createUserDatabaseIfNewUser(userCredential);
+
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } on FirebaseAuthException catch (error) {
@@ -138,7 +175,13 @@ class FirebaseAuthService {
             FacebookAuthProvider.credential(loginResult.accessToken!.token);
 
         // Once signed in, return the UserCredential
-        FirebaseAuth.instance.signInWithCredential(facebookAuthCredential);
+        final UserCredential userCredential =
+            await _auth.signInWithCredential(facebookAuthCredential);
+
+        createUserDatabaseIfNewUser(userCredential);
+        print(userCredential);
+
+
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
     } on FirebaseAuthException catch (error) {

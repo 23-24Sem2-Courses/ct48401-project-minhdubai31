@@ -16,11 +16,10 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  final TextEditingController _emailInputController = TextEditingController();
-  final TextEditingController _passwordInputController =
-      TextEditingController();
-  final TextEditingController _passwordConfirmInputController =
-      TextEditingController();
+  final _nameInputController = TextEditingController();
+  final _emailInputController = TextEditingController();
+  final _passwordInputController = TextEditingController();
+  final _passwordConfirmInputController = TextEditingController();
 
   bool _isEmailPasswordSignUpLoading = false;
   bool _isGoogleSignInLoading = false;
@@ -35,6 +34,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       showFlushbar(context: context, message: "Passwords do not match");
     } else {
       await context.read<FirebaseAuthService>().signUpWithEmailPassword(
+            name: _nameInputController.text,
             email: _emailInputController.text,
             password: _passwordInputController.text,
             context: context,
@@ -83,6 +83,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const WelcomeHeader(),
                 const SizedBox(
                   height: 20,
+                ),
+                CustomTextField(
+                  controller: _nameInputController,
+                  hintText: "Alloy",
+                  label: "Name",
+                ),
+                const SizedBox(
+                  height: 8,
                 ),
                 CustomTextField(
                   controller: _emailInputController,
