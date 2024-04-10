@@ -5,6 +5,7 @@ class Post {
   final String caption;
   final int totalLike;
   final String imageUrl;
+  final String imageFileName;
   final List<dynamic> likesUserIdList;
   final Timestamp createdAt;
 
@@ -13,6 +14,7 @@ class Post {
     required this.caption,
     required this.totalLike,
     required this.imageUrl,
+    required this.imageFileName,
     required this.likesUserIdList,
     required this.createdAt,
   });
@@ -22,6 +24,7 @@ class Post {
     String? caption,
     int? totalLike,
     String? imageUrl,
+    String? imageFileName,
     List<dynamic>? likesUserIdList,
     Timestamp? createdAt,
   }) {
@@ -30,6 +33,7 @@ class Post {
       caption: caption ?? this.caption,
       totalLike: totalLike ?? this.totalLike,
       imageUrl: imageUrl ?? this.imageUrl,
+      imageFileName: imageFileName ?? this.imageFileName,
       likesUserIdList: likesUserIdList ?? this.likesUserIdList,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -41,6 +45,7 @@ class Post {
           caption: json["caption"] as String,
           totalLike: json["totalLike"] as int,
           imageUrl: json["imageUrl"] as String,
+          imageFileName: json["imageFileName"] as String,
           likesUserIdList: json["likesUserIdList"] as List<dynamic>,
           createdAt: json["createdAt"] as Timestamp,
         );
@@ -50,6 +55,7 @@ class Post {
     "caption": caption,
     "totalLike": totalLike,
     "imageUrl": imageUrl,
+    "imageFileName": imageFileName,
     "likesUserIdList": likesUserIdList,
     "createdAt": createdAt,
   };

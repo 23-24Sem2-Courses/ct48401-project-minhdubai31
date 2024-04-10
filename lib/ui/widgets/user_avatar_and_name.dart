@@ -1,7 +1,8 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ct484_project/models/user.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:ionicons/ionicons.dart';
 
 class UserAvatarAndName extends StatelessWidget {
@@ -10,11 +11,13 @@ class UserAvatarAndName extends StatelessWidget {
     required this.user,
     this.popupMenuItems = const [],
     this.bigSize = false,
+    this.time,
   });
 
   final User user;
   bool bigSize;
   List<PopupMenuItem> popupMenuItems;
+  String? time;
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +31,16 @@ class UserAvatarAndName extends StatelessWidget {
       child: bigSize
           ? Column(
               children: [
-                Align(alignment: Alignment.centerRight, child: UserPopupMenu(popupMenuItems: popupMenuItems)),
+                Align(
+                    alignment: Alignment.centerRight,
+                    child: UserPopupMenu(popupMenuItems: popupMenuItems)),
                 CircleAvatar(
                   radius: 40,
                   backgroundColor: Colors.black26,
-                  child: CircleAvatar(backgroundImage: avatar, radius: 38,),
+                  child: CircleAvatar(
+                    backgroundImage: avatar,
+                    radius: 38,
+                  ),
                 ),
                 const SizedBox(
                   height: 10,
@@ -50,18 +58,36 @@ class UserAvatarAndName extends StatelessWidget {
                 Row(
                   children: [
                     SizedBox(
-                      width: 35,
-                      height: 35,
+                      width: 40,
+                      height: 40,
                       child: CircleAvatar(backgroundImage: avatar),
                     ),
                     const SizedBox(
                       width: 10,
                     ),
-                    Text(
-                      user.name,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w600, fontSize: 16),
-                    )
+                    time != null
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                user.name,
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600, fontSize: 16),
+                              ),
+                              Text(
+                                time!,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Color.fromRGBO(0, 0, 0, 0.5),
+                                ),
+                              )
+                            ],
+                          )
+                        : Text(
+                            user.name,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w600, fontSize: 16),
+                          )
                   ],
                 ),
                 // POP UP MENU

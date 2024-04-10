@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ct484_project/models/post.dart';
+import 'package:ct484_project/services/firebase_storage_service.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 const String postsCollectionRef = "posts";
 
@@ -34,7 +36,8 @@ class PostService {
     await _postsRef.doc(postId).update(post.toJson());
   }
 
-  Future<void> deletePost(String postId) async {
+  Future<void> deletePost(String postId, Post post) async {
     await _postsRef.doc(postId).delete();
+    await FirebaseStorageService(FirebaseStorage.instance).deletePostImage(post.imageFileName);
   }
 }

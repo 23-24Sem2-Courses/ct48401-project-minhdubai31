@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ct484_project/models/post.dart';
 import 'package:ct484_project/models/user.dart';
-import 'package:ct484_project/services/firebase_auth_service.dart';
+import 'package:ct484_project/services/comment_service.dart';
 import 'package:ct484_project/services/post_service.dart';
 import 'package:ct484_project/services/user_service.dart';
+import 'package:ct484_project/ui/utils/show_comment_sheet.dart';
 import 'package:ct484_project/ui/utils/show_delete_confirm_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:flutter/material.dart';
@@ -28,6 +31,71 @@ class PostCard extends StatefulWidget {
 
 class _PostCardState extends State<PostCard>
     with AutomaticKeepAliveClientMixin {
+  bool showHeart = false;
+
+  // ADD OR REMOVE USER ID FROM likesUserIdList
+  void toggleLike() {
+    if (widget.post.likesUserIdList
+        .contains(FirebaseAuth.instance.currentUser!.uid)) {
+      widget.post.likesUserIdList
+          .remove(FirebaseAuth.instance.currentUser!.uid);
+    } else {
+      widget.post.likesUserIdList.add(FirebaseAuth.instance.currentUser!.uid);
+    }
+    context.read<PostService>().updatePost(widget.postId, widget.post);
+  }
+
+  // ADD OR REMOVE USER ID FROM likesUserIdList
+  void likePost() {
+    setState(() {
+      showHeart = true;
+    });
+
+    if (widget.post.likesUserIdList
+            .contains(FirebaseAuth.instance.currentUser!.uid) ==
+        false) {
+      widget.post.likesUserIdList.add(FirebaseAuth.instance.currentUser!.uid);
+    }
+    context.read<PostService>().updatePost(widget.postId, widget.post);
+
+    Timer(const Duration(seconds: 1), () {
+      setState(() {
+        showHeart = false;
+      });
+    });
+  }
+
+  String calculatePostedTime() {
+    final postedTime = widget.post.createdAt.toDate();
+    final now = DateTime.now();
+
+    // Calculate the difference between now and the targetDateTime
+    Duration difference = now.difference(postedTime);
+
+    // Extract the components of the difference
+    int months = difference.inDays ~/ 30;
+    int days = difference.inDays % 30;
+    int hours = difference.inHours % 24;
+    int minutes = difference.inMinutes % 60;
+
+    // Prepare the formatted string based on the difference
+    String formattedTimeDifference = '';
+
+    if (months > 0) {
+      formattedTimeDifference += '$months month${months > 1 ? 's' : ''} ';
+      return formattedTimeDifference;
+    } else if (days > 0) {
+      formattedTimeDifference += '$days day${days > 1 ? 's' : ''} ';
+    } else if (hours > 0) {
+      formattedTimeDifference += '$hours hour${hours > 1 ? 's' : ''} ';
+    } else if (minutes > 0) {
+      formattedTimeDifference += '$minutes minute${minutes > 1 ? 's' : ''} ';
+    }
+    return formattedTimeDifference.isEmpty
+        ? "Just now"
+        : formattedTimeDifference;
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -77,13 +145,18 @@ class _PostCardState extends State<PostCard>
                   title: "Are you sure?",
                   content: "This action will permanently delete this post",
                   deleteMethod: () {
-                    context.read<PostService>().deletePost(widget.postId);
+                    context.read<PostService>().deletePost(widget.postId, widget.post);
                   },
                 );
               },
             ),
           ];
         }
+
+        final post = widget.post;
+        final postId = widget.postId;
+        final likesUserIdList = post.likesUserIdList;
+        final likesCount = likesUserIdList.length;
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,23 +165,54 @@ class _PostCardState extends State<PostCard>
             UserAvatarAndName(
               user: user,
               popupMenuItems: popupMenuItems,
+              time: calculatePostedTime(),
             ),
             const SizedBox(
               height: 8,
             ),
-            AspectRatio(
-              aspectRatio: 4 / 5,
-              child: CachedNetworkImage(
-                imageUrl: widget.post.imageUrl,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => const Center(
-                  child: SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(),
+            GestureDetector(
+              onDoubleTap: likePost,
+              child: Stack(
+                children: [
+                  AspectRatio(
+                    aspectRatio: 4 / 5,
+                    child: CachedNetworkImage(
+                      imageUrl: post.imageUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => const Center(
+                        child: SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error),
+                    ),
                   ),
-                ),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
+                  Positioned.fill(
+                    child: AnimatedScale(
+                      scale: showHeart ? 1.0 : 0.0,
+                      curve: Curves.easeOut,
+                      duration: const Duration(milliseconds: 150),
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          child: const Icon(
+                            Ionicons.heart,
+                            color: Colors.white,
+                            size: 60,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
 
@@ -126,20 +230,28 @@ class _PostCardState extends State<PostCard>
                         child: Row(
                           children: [
                             GestureDetector(
-                              onTap: () {
-                                print("Tap detected");
-                              },
-                              child: const Icon(
-                                Ionicons.heart_outline,
-                                size: 30,
-                              ),
+                              onTap: toggleLike,
+                              child: likesUserIdList.contains(
+                                      FirebaseAuth.instance.currentUser!.uid)
+                                  ? Icon(
+                                      Ionicons.heart,
+                                      size: 30,
+                                      color: Theme.of(context).primaryColor,
+                                    )
+                                  : const Icon(
+                                      Ionicons.heart_outline,
+                                      size: 30,
+                                    ),
                             ),
                             const SizedBox(
                               width: 20,
                             ),
                             GestureDetector(
                               onTap: () {
-                                print("Tap detected");
+                                showCommentSheet(
+                                    context: context,
+                                    post: post,
+                                    postId: postId);
                               },
                               child: const Icon(
                                 Ionicons.chatbox_outline,
@@ -151,15 +263,18 @@ class _PostCardState extends State<PostCard>
                       ),
                       GestureDetector(
                         onTap: () {},
-                        child: const Text(
-                          "1.024 likes",
-                          style: TextStyle(
+                        child: Text(
+                          likesUserIdList.isEmpty
+                              ? ""
+                              : "$likesCount like${likesCount > 1 ? 's' : ''}",
+                          style: const TextStyle(
                             color: Color.fromRGBO(0, 0, 0, 0.4),
                           ),
                         ),
                       )
                     ],
                   ),
+
                   // POST CONTENT
                   Row(
                     children: [
@@ -169,21 +284,29 @@ class _PostCardState extends State<PostCard>
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        widget.post.caption,
+                        post.caption,
                         style: const TextStyle(fontSize: 16),
                       ),
                     ],
                   ),
                   GestureDetector(
                     onTap: () {
-                      print("Tap");
+                      showCommentSheet(
+                          context: context, post: post, postId: postId);
                     },
-                    child: const Text(
-                      "View all 4 comments",
-                      style: TextStyle(
-                        color: Color.fromRGBO(0, 0, 0, 0.4),
-                      ),
-                    ),
+                    child: StreamBuilder(
+                        stream: context
+                            .read<CommentService>()
+                            .getCommentsOfPost(postId),
+                        builder: (context, snapshot) {
+                          List comments = snapshot.data?.docs ?? [];
+                          return Text(
+                            "View ${comments.isEmpty ? '' : "all ${comments.length} "}comment${comments.length > 1 ? 's' : ''}",
+                            style: const TextStyle(
+                              color: Color.fromRGBO(0, 0, 0, 0.4),
+                            ),
+                          );
+                        }),
                   ),
                 ],
               ),

@@ -35,12 +35,12 @@ class ConfirmDeleteDialog extends StatelessWidget {
     return AlertDialog(
       title: Text(
         title,
-        style: TextStyle(fontWeight: FontWeight.bold),
+        style: const TextStyle(fontWeight: FontWeight.bold),
         textAlign: TextAlign.center,
       ),
       content: Text(
         content,
-        style: TextStyle(fontSize: 16),
+        style: const TextStyle(fontSize: 16),
       ),
       actions: [
         Row(
@@ -52,7 +52,7 @@ class ConfirmDeleteDialog extends StatelessWidget {
                 Navigator.of(context).pop();
                 showFlushbar(
                     context: context,
-                    message: "Post was deleted successfully",
+                    message: "Deleted successfully",
                     color: Theme.of(context).primaryColor);
               },
               child: Text(

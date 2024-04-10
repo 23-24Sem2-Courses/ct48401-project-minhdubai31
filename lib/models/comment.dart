@@ -1,30 +1,44 @@
-import 'package:ct484_project/models/post.dart';
-import 'package:ct484_project/models/user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Comment {
   final String content;
-  final User owner;
-  final Post post;
-  final List<Comment> replies;
+  final String ownerUserId;
+  final String postId;
+  final Timestamp createdAt;
 
   Comment({
     required this.content,
-    required this.post,
-    required this.owner,
-    required this.replies,
+    required this.postId,
+    required this.ownerUserId,
+    required this.createdAt,
   });
 
   Comment copyWith({
     String? content,
-    Post? post,
-    User? owner,
-    List<Comment>? replies,
+    String? postId,
+    String? ownerUserId,
+    Timestamp? createdAt,
   }) {
     return Comment(
       content: content ?? this.content,
-      post: post ?? this.post,
-      owner: owner ?? this.owner,
-      replies: replies ?? this.replies,
+      postId: postId ?? this.postId,
+      ownerUserId: ownerUserId ?? this.ownerUserId,
+      createdAt: createdAt ?? this.createdAt,
     );
   }
+
+  Comment.fromJson(Map<String, dynamic> json)
+      : this(
+          content: json["content"] as String,
+          postId: json["postId"] as String,
+          ownerUserId: json["owner"] as String,
+          createdAt: json["createdAt"] as Timestamp,
+        );
+
+  Map<String, dynamic> toJson() => {
+        "content": content,
+        "postId": postId,
+        "owner": ownerUserId,
+        "createdAt": createdAt,
+      };
 }

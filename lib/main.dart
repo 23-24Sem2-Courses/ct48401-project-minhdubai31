@@ -1,5 +1,6 @@
 import 'package:ct484_project/firebase_options.dart';
 import 'package:ct484_project/models/post.dart';
+import 'package:ct484_project/services/comment_service.dart';
 import 'package:ct484_project/services/firebase_auth_service.dart';
 import 'package:ct484_project/services/firebase_storage_service.dart';
 import 'package:ct484_project/services/post_service.dart';
@@ -8,9 +9,8 @@ import 'package:ct484_project/ui/auth/auth_gate.dart';
 import 'package:ct484_project/ui/auth/login_screen.dart';
 import 'package:ct484_project/ui/auth/password_reset_screen.dart';
 import 'package:ct484_project/ui/auth/signup_screen.dart';
-import 'package:ct484_project/ui/home/main_screen.dart';
-import 'package:ct484_project/ui/home/user_personal_post_screen.dart';
-import 'package:ct484_project/ui/pages/create_edit_post_screen.dart';
+import 'package:ct484_project/ui/screens/user_personal_post_screen.dart';
+import 'package:ct484_project/ui/screens/create_edit_post_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -52,6 +52,9 @@ class MyApp extends StatelessWidget {
         ),
         Provider<UserService>(
           create: (ctx) => UserService(),
+        ),
+        Provider<CommentService>(
+          create: (ctx) => CommentService(),
         )
       ],
       // CHANGE THE COLOR OF STATUS BAR
@@ -68,6 +71,9 @@ class MyApp extends StatelessWidget {
                 FlexColorScheme.light(scheme: FlexScheme.aquaBlue).toScheme,
             textTheme: GoogleFonts.robotoFlexTextTheme(),
             useMaterial3: true,
+            bottomSheetTheme: const BottomSheetThemeData(
+              surfaceTintColor: Colors.white,
+            ),
           ),
           onGenerateRoute: (settings) {
             String? routeName = settings.name;
@@ -90,7 +96,8 @@ class MyApp extends StatelessWidget {
                     );
                   },
                 );
-              default: return null;
+              default:
+                return null;
             }
           },
           routes: {
