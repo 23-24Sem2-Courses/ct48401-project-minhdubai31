@@ -76,8 +76,8 @@ class _BottomNavigationState extends State<BottomNavigation> {
               await ImagePicker().pickImage(source: ImageSource.gallery);
           if (selectedImage != null) {
             Navigator.of(context).pushNamed(
-              "/new_post_screen",
-              arguments: selectedImage,
+              "/create_edit_post_screen",
+              arguments: {"imageXFile": selectedImage},
             );
           }
         } else {

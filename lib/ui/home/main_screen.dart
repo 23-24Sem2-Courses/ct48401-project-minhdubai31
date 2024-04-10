@@ -1,20 +1,16 @@
-import 'package:ct484_project/services/firebase_auth_service.dart';
+import 'package:ct484_project/ui/home/user_tab_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../pages/home_page.dart';
+import '../pages/home_tab_screen.dart';
 import '../widgets/bottom_navigation.dart';
 
-class HomeScreen extends StatefulWidget {
-  static String routeName = '/home';
-
-  const HomeScreen({super.key});
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
+class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
   TabController? _tabController;
 
@@ -37,14 +33,9 @@ class _HomeScreenState extends State<HomeScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          const HomePage(),
-          ElevatedButton(
-            onPressed: () {
-              context.read<FirebaseAuthService>().signOut(context: context);
-            },
-            child: const Text("Sign out"),
-          ),
+        children: const [
+          HomeTabScreen(),
+          UserTabScreen()
         ],
       ),
     );

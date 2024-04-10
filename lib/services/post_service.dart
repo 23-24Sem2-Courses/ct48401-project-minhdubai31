@@ -19,6 +19,13 @@ class PostService {
     return _postsRef.orderBy("createdAt", descending: true).snapshots();
   }
 
+  Stream<QuerySnapshot> getPostsOfUser(String userId) {
+    return _postsRef
+        .where("ownerUserId", isEqualTo: userId)
+        .orderBy("createdAt", descending: true)
+        .snapshots();
+  }
+
   Future<void> createPost(Post post) async {
     await _postsRef.add(post);
   }

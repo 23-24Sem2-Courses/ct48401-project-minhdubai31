@@ -1,4 +1,5 @@
 import 'package:ct484_project/firebase_options.dart';
+import 'package:ct484_project/models/post.dart';
 import 'package:ct484_project/services/firebase_auth_service.dart';
 import 'package:ct484_project/services/firebase_storage_service.dart';
 import 'package:ct484_project/services/post_service.dart';
@@ -7,8 +8,9 @@ import 'package:ct484_project/ui/auth/auth_gate.dart';
 import 'package:ct484_project/ui/auth/login_screen.dart';
 import 'package:ct484_project/ui/auth/password_reset_screen.dart';
 import 'package:ct484_project/ui/auth/signup_screen.dart';
-import 'package:ct484_project/ui/home/home_screen.dart';
-import 'package:ct484_project/ui/pages/create_new_post_screen.dart';
+import 'package:ct484_project/ui/home/main_screen.dart';
+import 'package:ct484_project/ui/home/user_personal_post_screen.dart';
+import 'package:ct484_project/ui/pages/create_edit_post_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -17,6 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -66,14 +69,35 @@ class MyApp extends StatelessWidget {
             textTheme: GoogleFonts.robotoFlexTextTheme(),
             useMaterial3: true,
           ),
+          onGenerateRoute: (settings) {
+            String? routeName = settings.name;
+            Object? args = settings.arguments;
+            switch (routeName) {
+              case UserPersonalPostScreen.routeName:
+                return MaterialPageRoute(
+                  builder: (context) => UserPersonalPostScreen(
+                    selectedPostIndex: args as int,
+                  ),
+                );
+              case CreateEditPostScreen.routeName:
+                return MaterialPageRoute(
+                  builder: (context) {
+                    args as Map<String, Object>;
+                    return CreateEditPostScreen(
+                      imageXFile: args['imageXFile'] as XFile?,
+                      post: args['post'] as Post?,
+                      postId: args['postId'] as String?,
+                    );
+                  },
+                );
+              default: return null;
+            }
+          },
           routes: {
-            HomeScreen.routeName: (context) => const HomeScreen(),
             PasswordResetScreen.routeName: (context) =>
                 const PasswordResetScreen(),
             LoginScreen.routeName: (context) => const LoginScreen(),
             SignUpScreen.routeName: (context) => const SignUpScreen(),
-            CreateNewPostScreen.routeName: (context) =>
-                const CreateNewPostScreen(),
           },
           home: const AuthGate(),
         ),

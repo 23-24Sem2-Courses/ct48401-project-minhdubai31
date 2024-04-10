@@ -1,5 +1,5 @@
 import 'package:ct484_project/ui/auth/login_screen.dart';
-import 'package:ct484_project/ui/home/home_screen.dart';
+import 'package:ct484_project/ui/home/main_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +14,7 @@ class AuthGate extends StatelessWidget {
           if (!snapshot.hasData) {
             return const LoginScreen();
           } else {
-            return const HomeScreen();
+            return const MainScreen();
           }
         },);
   }

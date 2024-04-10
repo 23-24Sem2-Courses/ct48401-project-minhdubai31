@@ -5,13 +5,20 @@ import 'package:ct484_project/ui/widgets/post_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({
+class HomeTabScreen extends StatefulWidget {
+  const HomeTabScreen({
     super.key,
   });
 
   @override
+  State<HomeTabScreen> createState() => _HomeTabScreenState();
+}
+
+class _HomeTabScreenState extends State<HomeTabScreen>
+    with AutomaticKeepAliveClientMixin {
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return SafeArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,7 +62,10 @@ class HomePage extends StatelessWidget {
                         const SizedBox(
                           height: 15,
                         ),
-                        PostCard(post: post),
+                        PostCard(
+                          post: post,
+                          postId: posts[index].id,
+                        ),
                         const SizedBox(
                           height: 15,
                         )
@@ -70,4 +80,8 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
