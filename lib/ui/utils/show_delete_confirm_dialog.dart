@@ -35,12 +35,14 @@ class ConfirmDeleteDialog extends StatelessWidget {
     return AlertDialog(
       title: Text(
         title,
-        style: const TextStyle(fontWeight: FontWeight.bold),
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         textAlign: TextAlign.center,
       ),
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
       content: Text(
         content,
-        style: const TextStyle(fontSize: 16),
+        style: const TextStyle(fontSize: 15),
       ),
       actions: [
         Row(
@@ -60,7 +62,7 @@ class ConfirmDeleteDialog extends StatelessWidget {
                 style: TextStyle(
                     color: Theme.of(context).colorScheme.error,
                     fontWeight: FontWeight.bold,
-                    fontSize: 16),
+                    fontSize: 15),
               ),
             ),
             const SizedBox(
@@ -72,7 +74,7 @@ class ConfirmDeleteDialog extends StatelessWidget {
               },
               child: const Text(
                 "Cancel",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15,),
               ),
             ),
           ],

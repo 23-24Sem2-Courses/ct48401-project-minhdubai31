@@ -63,7 +63,7 @@ class OauthButton extends StatelessWidget {
                         ),
                         Text(
                           text,
-                          style: TextStyle(color: textColor, fontSize: 16),
+                          style: TextStyle(color: textColor, fontSize: 15),
                         ),
                       ],
                     )

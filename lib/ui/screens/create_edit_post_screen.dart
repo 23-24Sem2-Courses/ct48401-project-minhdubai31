@@ -83,7 +83,9 @@ class _CreateEditPostScreenState extends State<CreateEditPostScreen> {
       uploadedImage = await context
           .read<FirebaseStorageService>()
           .uploadPostImage(imageFile);
-      await context.read<FirebaseStorageService>().deletePostImage(post.imageFileName);
+      await context
+          .read<FirebaseStorageService>()
+          .deletePostImage(post.imageFileName);
       await context.read<PostService>().updatePost(
             postId,
             post.copyWith(
@@ -159,8 +161,10 @@ class _CreateEditPostScreenState extends State<CreateEditPostScreen> {
                 builder: (context, snapshot) {
                   User? user = snapshot.data?.data() as User?;
 
-                  if(snapshot.connectionState == ConnectionState.waiting) {
-                    return const SizedBox(height: 50,);
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const SizedBox(
+                      height: 50,
+                    );
                   }
 
                   if (user == null) {
@@ -212,8 +216,10 @@ class _CreateEditPostScreenState extends State<CreateEditPostScreen> {
               const Text(
                 "Double tap on the image to select another",
                 style: TextStyle(
-                    color: Color.fromRGBO(0, 0, 0, 0.4),
-                    fontStyle: FontStyle.italic),
+                  color: Color.fromRGBO(0, 0, 0, 0.3),
+                  fontStyle: FontStyle.italic,
+                  fontSize: 11,
+                ),
               ),
               const SizedBox(
                 height: 4,
@@ -224,6 +230,9 @@ class _CreateEditPostScreenState extends State<CreateEditPostScreen> {
                 child: TextField(
                   controller: _captionInputController,
                   maxLines: 5,
+                  style: const TextStyle(
+                    fontSize: 15,
+                  ),
                   keyboardType: TextInputType.multiline,
                   decoration: const InputDecoration(
                     border: InputBorder.none,

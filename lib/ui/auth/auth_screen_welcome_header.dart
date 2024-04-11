@@ -13,7 +13,7 @@ class WelcomeHeader extends StatelessWidget {
       children: [
         const Text(
           "Welcome to",
-          style: TextStyle(fontSize: 16),
+          style: TextStyle(fontSize: 15),
         ),
         GradientText(
           "Photos Share",

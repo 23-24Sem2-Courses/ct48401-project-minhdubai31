@@ -145,7 +145,9 @@ class _PostCardState extends State<PostCard>
                   title: "Are you sure?",
                   content: "This action will permanently delete this post",
                   deleteMethod: () {
-                    context.read<PostService>().deletePost(widget.postId, widget.post);
+                    context
+                        .read<PostService>()
+                        .deletePost(widget.postId, widget.post);
                   },
                 );
               },
@@ -268,8 +270,8 @@ class _PostCardState extends State<PostCard>
                               ? ""
                               : "$likesCount like${likesCount > 1 ? 's' : ''}",
                           style: const TextStyle(
-                            color: Color.fromRGBO(0, 0, 0, 0.4),
-                          ),
+                              color: Color.fromRGBO(0, 0, 0, 0.4),
+                              fontSize: 13),
                         ),
                       )
                     ],
@@ -281,13 +283,16 @@ class _PostCardState extends State<PostCard>
                       Text(
                         "${user.name} ",
                         style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                            fontSize: 15, fontWeight: FontWeight.bold),
                       ),
                       Text(
                         post.caption,
-                        style: const TextStyle(fontSize: 16),
+                        style: const TextStyle(fontSize: 15),
                       ),
                     ],
+                  ),
+                  const SizedBox(
+                    height: 2,
                   ),
                   GestureDetector(
                     onTap: () {
@@ -303,8 +308,8 @@ class _PostCardState extends State<PostCard>
                           return Text(
                             "View ${comments.isEmpty ? '' : "all ${comments.length} "}comment${comments.length > 1 ? 's' : ''}",
                             style: const TextStyle(
-                              color: Color.fromRGBO(0, 0, 0, 0.4),
-                            ),
+                                color: Color.fromRGBO(0, 0, 0, 0.4),
+                                fontSize: 14),
                           );
                         }),
                   ),

@@ -48,7 +48,7 @@ class UserAvatarAndName extends StatelessWidget {
                 Text(
                   user.name,
                   style: const TextStyle(
-                      fontWeight: FontWeight.w600, fontSize: 16),
+                      fontWeight: FontWeight.w600, fontSize: 15),
                 )
               ],
             )
@@ -58,8 +58,8 @@ class UserAvatarAndName extends StatelessWidget {
                 Row(
                   children: [
                     SizedBox(
-                      width: 40,
-                      height: 40,
+                      width: 38,
+                      height: 38,
                       child: CircleAvatar(backgroundImage: avatar),
                     ),
                     const SizedBox(
@@ -72,12 +72,12 @@ class UserAvatarAndName extends StatelessWidget {
                               Text(
                                 user.name,
                                 style: const TextStyle(
-                                    fontWeight: FontWeight.w600, fontSize: 16),
+                                    fontWeight: FontWeight.w600, fontSize: 15),
                               ),
                               Text(
                                 time!,
                                 style: const TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 11,
                                   color: Color.fromRGBO(0, 0, 0, 0.5),
                                 ),
                               )
@@ -86,7 +86,7 @@ class UserAvatarAndName extends StatelessWidget {
                         : Text(
                             user.name,
                             style: const TextStyle(
-                                fontWeight: FontWeight.w600, fontSize: 16),
+                                fontWeight: FontWeight.w600, fontSize: 15),
                           )
                   ],
                 ),
