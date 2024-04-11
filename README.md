@@ -2,9 +2,9 @@
 
 Học kỳ 2, Năm học 2023-2024
 
-**MSSV 1** : 
+**MSSV 1** : B2014671
 
-**Họ tên SV 1**:
+**Họ tên SV 1**: Trà Hoàng Minh
 
 **MSSV 2**:
 
