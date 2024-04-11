@@ -10,7 +10,7 @@ Học kỳ 2, Năm học 2023-2024
 
 **Họ tên SV 2**:
 
-**Lớp học phần**:
+**Lớp học phần**: CT48401
 
-**Tên dự án**:
+**Tên dự án**: Ứng dụng chia sẻ hình ảnh - Photos Share
 
