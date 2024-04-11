@@ -9,6 +9,7 @@ class CustomTextField extends StatelessWidget {
   String? error;
   bool? autofocus;
   bool? obscureText;
+  int? maxLines;
 
   CustomTextField({
     super.key,
@@ -18,6 +19,7 @@ class CustomTextField extends StatelessWidget {
     this.error,
     this.autofocus,
     this.obscureText,
+    this.maxLines = 1,
   });
 
   @override
@@ -26,6 +28,7 @@ class CustomTextField extends StatelessWidget {
       controller: controller,
       obscureText: obscureText != null ? obscureText! : false,
       autofocus: autofocus != null ? autofocus! : false,
+      maxLines: maxLines,
       decoration: InputDecoration(
         border: UnderlineInputBorder(
           borderRadius: BorderRadius.circular(8),

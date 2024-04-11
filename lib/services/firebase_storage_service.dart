@@ -24,17 +24,22 @@ class FirebaseStorageService {
     };
   }
 
-  Future<String> uploadAvatarImage(XFile xfile) async {
+  Future<Map<String, String>> uploadAvatarImage(XFile xfile) async {
     final File file = File(xfile.path);
-    final Reference fileToUploadRef = _storage
-        .ref()
-        .child(avatarStorageRef + DateTime.timestamp().toString() + xfile.name);
-    return await fileToUploadRef
-        .putFile(file)
-        .then((value) => value.ref.getDownloadURL());
+    String newName =
+        avatarStorageRef + DateTime.timestamp().toString() + xfile.name;
+    final Reference fileToUploadRef = _storage.ref().child(newName);
+    return {
+      "url": await fileToUploadRef
+          .putFile(file)
+          .then((value) => value.ref.getDownloadURL()),
+      "name": newName
+    };
   }
 
-  Future<void> deletePostImage(String fileName) async {
+  Future<void> deleteImage(String fileName) async {
     await _storage.ref().child(fileName).delete();
   }
+
+
 }

@@ -5,7 +5,7 @@ import 'package:ct484_project/models/user.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 
-class UserAvatarAndName extends StatelessWidget {
+class UserAvatarAndName extends StatefulWidget {
   UserAvatarAndName({
     super.key,
     required this.user,
@@ -20,20 +20,29 @@ class UserAvatarAndName extends StatelessWidget {
   String? time;
 
   @override
+  State<UserAvatarAndName> createState() => _UserAvatarAndNameState();
+}
+
+class _UserAvatarAndNameState extends State<UserAvatarAndName> with AutomaticKeepAliveClientMixin {
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     ImageProvider avatar = const AssetImage('assets/avatar.png');
 
-    if (user.avatarUrl != "") {
-      avatar = CachedNetworkImageProvider(user.avatarUrl);
+    if (widget.user.avatarUrl != "") {
+      avatar = CachedNetworkImageProvider(widget.user.avatarUrl);
     }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
-      child: bigSize
+      child: widget.bigSize
+
+          // FOR USER TAB
           ? Column(
               children: [
                 Align(
-                    alignment: Alignment.centerRight,
-                    child: UserPopupMenu(popupMenuItems: popupMenuItems)),
+                  alignment: Alignment.centerRight,
+                  child: UserPopupMenu(popupMenuItems: widget.popupMenuItems),
+                ),
                 CircleAvatar(
                   radius: 40,
                   backgroundColor: Colors.black26,
@@ -46,12 +55,38 @@ class UserAvatarAndName extends StatelessWidget {
                   height: 10,
                 ),
                 Text(
-                  user.name,
+                  widget.user.name,
                   style: const TextStyle(
-                      fontWeight: FontWeight.w600, fontSize: 15),
-                )
+                      fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+                const SizedBox(
+                  height: 4,
+                ),
+                widget.user.biography == ""
+                    ? GestureDetector(
+                        onTap: () => Navigator.of(context)
+                            .pushNamed("/user_profile_edit", arguments: widget.user),
+                        child: Text(
+                          "Add biography",
+                          style:
+                              TextStyle(color: Theme.of(context).primaryColor),
+                        ),
+                      )
+                    : Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: Text(
+                          widget.user.biography,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Color.fromRGBO(0, 0, 0, 0.5),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                    ),
               ],
             )
+
+          // FOR HOME TAB
           : Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -64,18 +99,19 @@ class UserAvatarAndName extends StatelessWidget {
                     ),
                     const SizedBox(
                       width: 10,
+                      height: 45,
                     ),
-                    time != null
+                    widget.time != null
                         ? Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                user.name,
+                                widget.user.name,
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w600, fontSize: 15),
                               ),
                               Text(
-                                time!,
+                                widget.time!,
                                 style: const TextStyle(
                                   fontSize: 11,
                                   color: Color.fromRGBO(0, 0, 0, 0.5),
@@ -84,18 +120,23 @@ class UserAvatarAndName extends StatelessWidget {
                             ],
                           )
                         : Text(
-                            user.name,
+                            widget.user.name,
                             style: const TextStyle(
                                 fontWeight: FontWeight.w600, fontSize: 15),
                           )
                   ],
                 ),
                 // POP UP MENU
-                UserPopupMenu(popupMenuItems: popupMenuItems)
+                if (widget.popupMenuItems.isNotEmpty)
+                  UserPopupMenu(popupMenuItems: widget.popupMenuItems),
               ],
             ),
     );
   }
+  
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
 
 class UserPopupMenu extends StatelessWidget {

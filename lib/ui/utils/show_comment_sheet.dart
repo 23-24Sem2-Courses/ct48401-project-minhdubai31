@@ -13,7 +13,7 @@ String calculateCommentedTime(Comment comment) {
   final postedTime = comment.createdAt.toDate();
   final now = DateTime.now();
 
-  // Calculate the difference between now and the targetDateTime
+  // Calculate the difference between now and the target DateTime
   Duration difference = now.difference(postedTime);
 
   // Extract the components of the difference
@@ -48,10 +48,11 @@ void showCommentSheet({
   Future<void> createComment() async {
     await context.read<CommentService>().createComment(
           Comment(
-              content: commentInputController.text,
-              postId: postId,
-              ownerUserId: FirebaseAuth.instance.currentUser!.uid,
-              createdAt: Timestamp.now()),
+            content: commentInputController.text,
+            postId: postId,
+            ownerUserId: FirebaseAuth.instance.currentUser!.uid,
+            createdAt: Timestamp.now(),
+          ),
         );
     commentInputController.clear();
   }
@@ -79,7 +80,9 @@ void showCommentSheet({
                       List comments = snapshot.data?.docs ?? [];
 
                       if (comments.isEmpty) {
-                        return const Center(child: Text("Be the first to comment on this post"));
+                        return const Center(
+                            child:
+                                Text("Be the first to comment on this post"));
                       }
 
                       return ListView.builder(
@@ -106,31 +109,32 @@ void showCommentSheet({
                   style: const TextStyle(fontSize: 15),
                   textInputAction: TextInputAction.send,
                   decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 10),
-                      filled: true,
-                      fillColor: const Color(0xfff2f2f6),
-                      hintText: "Add a comment",
-                      hintStyle:
-                          const TextStyle(color: Color.fromRGBO(0, 0, 0, 0.4)),
-                      floatingLabelStyle: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      suffixIcon: IconButton(
-                        onPressed: () async {
-                          await createComment();
-                        },
-                        icon: const Icon(Ionicons.send),
-                      )),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 10),
+                    filled: true,
+                    fillColor: const Color(0xfff2f2f6),
+                    hintText: "Add a comment",
+                    hintStyle:
+                        const TextStyle(color: Color.fromRGBO(0, 0, 0, 0.4)),
+                    floatingLabelStyle: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    suffixIcon: IconButton(
+                      onPressed: () async {
+                        await createComment();
+                      },
+                      icon: const Icon(Ionicons.send),
+                    ),
+                  ),
                 )
               ],
             ),

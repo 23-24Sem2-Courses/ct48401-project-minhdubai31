@@ -10,11 +10,11 @@ import 'package:ct484_project/services/firebase_storage_service.dart';
 import 'package:ct484_project/services/post_service.dart';
 import 'package:ct484_project/services/user_service.dart';
 import 'package:ct484_project/ui/utils/show_flushbar.dart';
-import 'package:ct484_project/ui/widgets/custom_button.dart';
 import 'package:ct484_project/ui/widgets/user_avatar_and_name.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:ionicons/ionicons.dart';
 import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
@@ -29,7 +29,8 @@ class CreateEditPostScreen extends StatefulWidget {
   State<CreateEditPostScreen> createState() => _CreateEditPostScreenState();
 }
 
-class _CreateEditPostScreenState extends State<CreateEditPostScreen> {
+class _CreateEditPostScreenState extends State<CreateEditPostScreen>
+    with AutomaticKeepAliveClientMixin {
   final _captionInputController = TextEditingController();
 
   bool isUploading = false;
@@ -85,7 +86,7 @@ class _CreateEditPostScreenState extends State<CreateEditPostScreen> {
           .uploadPostImage(imageFile);
       await context
           .read<FirebaseStorageService>()
-          .deletePostImage(post.imageFileName);
+          .deleteImage(post.imageFileName);
       await context.read<PostService>().updatePost(
             postId,
             post.copyWith(
@@ -109,6 +110,14 @@ class _CreateEditPostScreenState extends State<CreateEditPostScreen> {
     Navigator.of(context).pop();
   }
 
+  void selectNewImage() async {
+    XFile? newImageXFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
+    setState(() {
+      widget.imageXFile = newImageXFile ?? widget.imageXFile;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -119,34 +128,44 @@ class _CreateEditPostScreenState extends State<CreateEditPostScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isKeyboardClose =
-        MediaQuery.of(context).viewInsets.bottom == 0.0;
-
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
         title: widget.post != null
-            ? const Text("Edit Post")
-            : const Text('Create New Post'),
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text("Edit Post"),
+                  IconButton(
+                    onPressed: () => updatePost(
+                        widget.imageXFile, widget.post!, widget.postId!),
+                    icon: isUploading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(),
+                          )
+                        : const Icon(Ionicons.save_outline),
+                  ),
+                ],
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Create New Post'),
+                  IconButton(
+                    onPressed: () => createPost(widget.imageXFile!),
+                    icon: isUploading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(),
+                          )
+                        : const Icon(Ionicons.create_outline),
+                  )
+                ],
+              ),
       ),
-      floatingActionButton: Visibility(
-        visible: isKeyboardClose,
-        maintainAnimation: true,
-        maintainState: true,
-        child: AnimatedSlide(
-          offset: isKeyboardClose ? const Offset(0, 0) : const Offset(0, 1.5),
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.ease,
-          child: CustomButton(
-            onTap: () => widget.post != null
-                ? updatePost(widget.imageXFile, widget.post!, widget.postId!)
-                : createPost(widget.imageXFile!),
-            text: widget.post != null ? "Update" : "Share",
-            isLoading: isUploading,
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButtonAnimator: null,
       body: SafeArea(
         child: SingleChildScrollView(
           reverse: false,
@@ -154,77 +173,77 @@ class _CreateEditPostScreenState extends State<CreateEditPostScreen> {
           child: Column(
             children: [
               // AVATAR AND NAME
-              FutureBuilder(
-                future: context
-                    .read<UserService>()
-                    .getUser(FirebaseAuth.instance.currentUser!.uid),
+              StreamBuilder(
+                stream: context.read<UserService>().getUsers(),
                 builder: (context, snapshot) {
-                  User? user = snapshot.data?.data() as User?;
-
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const SizedBox(
-                      height: 50,
-                    );
-                  }
-
-                  if (user == null) {
-                    return const Center(
-                      child: null,
-                    );
-                  }
-                  return UserAvatarAndName(user: user);
-                },
+                  return FutureBuilder(
+                    future: context
+                        .read<UserService>()
+                        .getUser(FirebaseAuth.instance.currentUser!.uid),
+                    builder: (context, snapshot) {
+                      User? user = snapshot.data?.data() as User?;
+                  
+                      if (user == null) {
+                        return const Center(
+                          child: null,
+                        );
+                      }
+                      return UserAvatarAndName(user: user);
+                    },
+                  );
+                }
               ),
               const SizedBox(
                 height: 8,
               ),
-              GestureDetector(
-                child: AspectRatio(
-                  aspectRatio: 4 / 5,
-                  // IF imageXFile == NULL => UPDATE => SHOW THE CURRENT IMAGE OF THE POST
-                  child: widget.imageXFile == null
-                      ? CachedNetworkImage(
-                          imageUrl: widget.post!.imageUrl,
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) => const Center(
-                            child: SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(),
+              Stack(
+                children: [
+                  GestureDetector(
+                    onDoubleTap: selectNewImage,
+                    child: AspectRatio(
+                      aspectRatio: 4 / 5,
+                      // IF imageXFile == NULL => UPDATE => SHOW THE CURRENT IMAGE OF THE POST
+                      child: widget.imageXFile == null
+                          ? CachedNetworkImage(
+                              imageUrl: widget.post!.imageUrl,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => const Center(
+                                child: SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error),
+                            )
+                          // ELSE => CREATE NEW => SHOW SELECTED IMAGE
+                          : Image.file(
+                              File(widget.imageXFile!.path),
+                              fit: BoxFit.cover,
                             ),
-                          ),
-                          errorWidget: (context, url, error) =>
-                              const Icon(Icons.error),
-                        )
-                      // ELSE => CREATE NEW => SHOW SELECTED IMAGE
-                      : Image.file(
-                          File(widget.imageXFile!.path),
-                          fit: BoxFit.cover,
+                    ),
+                  ),
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: IconButton(
+                      onPressed: selectNewImage,
+                      icon: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(50),
+                          color: Colors.white,
                         ),
-                ),
-                onDoubleTap: () async {
-                  XFile? newImageXFile = await ImagePicker()
-                      .pickImage(source: ImageSource.gallery);
-                  setState(() {
-                    widget.imageXFile = newImageXFile ?? widget.imageXFile;
-                  });
-                },
+                        child: const Icon(Ionicons.swap_horizontal_outline),
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(
                 height: 4,
               ),
-              const Text(
-                "Double tap on the image to select another",
-                style: TextStyle(
-                  color: Color.fromRGBO(0, 0, 0, 0.3),
-                  fontStyle: FontStyle.italic,
-                  fontSize: 11,
-                ),
-              ),
-              const SizedBox(
-                height: 4,
-              ),
-
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: TextField(
@@ -246,4 +265,8 @@ class _CreateEditPostScreenState extends State<CreateEditPostScreen> {
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

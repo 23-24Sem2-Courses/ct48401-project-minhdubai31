@@ -38,6 +38,6 @@ class PostService {
 
   Future<void> deletePost(String postId, Post post) async {
     await _postsRef.doc(postId).delete();
-    await FirebaseStorageService(FirebaseStorage.instance).deletePostImage(post.imageFileName);
+    await FirebaseStorageService(FirebaseStorage.instance).deleteImage(post.imageFileName);
   }
 }

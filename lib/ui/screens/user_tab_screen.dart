@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ct484_project/models/post.dart';
 import 'package:ct484_project/models/user.dart';
 import 'package:ct484_project/services/firebase_auth_service.dart';
@@ -10,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:provider/provider.dart';
 
+import '../widgets/post_preview_tile.dart';
+
 class UserTabScreen extends StatelessWidget {
   const UserTabScreen({super.key});
 
@@ -20,39 +21,56 @@ class UserTabScreen extends StatelessWidget {
         child: Column(
           children: [
             // AVATAR AND NAME
-            FutureBuilder(
-              future: context
-                  .read<UserService>()
-                  .getUser(FirebaseAuth.instance.currentUser!.uid),
+            StreamBuilder(
+              stream: context.read<UserService>().getUsers(),
               builder: (context, snapshot) {
-                User? user = snapshot.data?.data() as User?;
-
-                if (user == null) {
-                  return const Center(
-                    child: null,
-                  );
-                }
-                return UserAvatarAndName(
-                  user: user,
-                  bigSize: true,
-                  popupMenuItems: [
-                    PopupMenuItem(
-                      child: const Row(
-                        children: [
-                          Icon(Ionicons.log_out_outline),
-                          SizedBox(
-                            width: 20,
+                return FutureBuilder(
+                  future: context
+                      .read<UserService>()
+                      .getUser(FirebaseAuth.instance.currentUser!.uid),
+                  builder: (context, snapshot) {
+                    User? user = snapshot.data?.data() as User?;
+                
+                    if (user == null) {
+                      return const Center(
+                        child: null,
+                      );
+                    }
+                    return UserAvatarAndName(
+                      user: user,
+                      bigSize: true,
+                      popupMenuItems: [
+                        PopupMenuItem(
+                          child: const Row(
+                            children: [
+                              Icon(Ionicons.cog_outline),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              Text("Edit profile"),
+                            ],
                           ),
-                          Text("Sign out"),
-                        ],
-                      ),
-                      onTap: () => context
-                          .read<FirebaseAuthService>()
-                          .signOut(context: context),
-                    )
-                  ],
+                          onTap: () => Navigator.of(context).pushNamed("/user_profile_edit", arguments: user),
+                        ),
+                        PopupMenuItem(
+                          child: const Row(
+                            children: [
+                              Icon(Ionicons.log_out_outline),
+                              SizedBox(
+                                width: 20,
+                              ),
+                              Text("Sign out"),
+                            ],
+                          ),
+                          onTap: () => context
+                              .read<FirebaseAuthService>()
+                              .signOut(context: context),
+                        ),
+                      ],
+                    );
+                  },
                 );
-              },
+              }
             ),
 
             const SizedBox(
@@ -82,23 +100,7 @@ class UserTabScreen extends StatelessWidget {
                     );
                   }
 
-                  return GridView.builder(
-                    itemCount: posts.length,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 4,
-                      crossAxisSpacing: 4,
-                      mainAxisSpacing: 4,
-                    ),
-                    itemBuilder: (context, index) {
-                      Post post = posts[index].data();
-                      return GestureDetector(
-                          onTap: () => Navigator.of(context).pushNamed(
-                              "/user_personal_posts",
-                              arguments: index),
-                          child: PostPreviewTile(post: post));
-                    },
-                  );
+                  return PostGridView(posts: posts);
                 },
               ),
             ),
@@ -109,41 +111,32 @@ class UserTabScreen extends StatelessWidget {
   }
 }
 
-class PostPreviewTile extends StatefulWidget {
-  const PostPreviewTile({
+class PostGridView extends StatelessWidget {
+  const PostGridView({
     super.key,
-    required this.post,
+    required this.posts,
   });
 
-  final Post post;
+  final List posts;
 
-  @override
-  State<PostPreviewTile> createState() => _PostPreviewTileState();
-}
-
-class _PostPreviewTileState extends State<PostPreviewTile>
-    with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-    return AspectRatio(
-      aspectRatio: 1 / 1,
-      child: CachedNetworkImage(
-        imageUrl: widget.post.imageUrl,
-        fit: BoxFit.cover,
-        placeholder: (context, url) => const Center(
-          child: SizedBox(
-            height: 20,
-            width: 20,
-            child: CircularProgressIndicator(),
-          ),
-        ),
-        errorWidget: (context, url, error) => const Icon(Icons.error),
+    return GridView.builder(
+      itemCount: posts.length,
+      gridDelegate:
+          const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        crossAxisSpacing: 4,
+        mainAxisSpacing: 4,
       ),
+      itemBuilder: (context, index) {
+        Post post = posts[index].data();
+        return GestureDetector(
+            onTap: () => Navigator.of(context).pushNamed(
+                "/user_personal_posts",
+                arguments: index),
+            child: PostPreviewTile(post: post));
+      },
     );
   }
-
-  @override
-  // TODO: implement wantKeepAlive
-  bool get wantKeepAlive => true;
 }

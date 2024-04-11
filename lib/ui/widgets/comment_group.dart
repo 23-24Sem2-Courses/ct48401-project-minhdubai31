@@ -27,100 +27,105 @@ class CommentGroup extends StatelessWidget {
         const SizedBox(
           height: 15,
         ),
-        FutureBuilder(
-          future: context.read<UserService>().getUser(comment.ownerUserId),
+        StreamBuilder(
+          stream: context.read<UserService>().getUsers(),
           builder: (context, snapshot) {
-            User? user = snapshot.data?.data() as User?;
-
-            if (user == null) {
-              return const Center(
-                child: null,
-              );
-            }
-
-            ImageProvider avatar = const AssetImage('assets/avatar.png');
-
-            if (user.avatarUrl != "") {
-              avatar = CachedNetworkImageProvider(user.avatarUrl);
-            }
-
-            List<PopupMenuItem> popupMenuItems = [];
-            if (FirebaseAuth.instance.currentUser!.uid == comment.ownerUserId) {
-              popupMenuItems = [
-                PopupMenuItem(
-                  child: const Row(
-                    children: [
-                      Icon(Ionicons.trash_bin_outline),
-                      SizedBox(
-                        width: 10,
+            return FutureBuilder(
+              future: context.read<UserService>().getUser(comment.ownerUserId),
+              builder: (context, snapshot) {
+                User? user = snapshot.data?.data() as User?;
+            
+                if (user == null) {
+                  return const Center(
+                    child: null,
+                  );
+                }
+            
+                ImageProvider avatar = const AssetImage('assets/avatar.png');
+            
+                if (user.avatarUrl != "") {
+                  avatar = CachedNetworkImageProvider(user.avatarUrl);
+                }
+            
+                List<PopupMenuItem> popupMenuItems = [];
+                if (FirebaseAuth.instance.currentUser!.uid == comment.ownerUserId) {
+                  popupMenuItems = [
+                    PopupMenuItem(
+                      child: const Row(
+                        children: [
+                          Icon(Ionicons.trash_bin_outline),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text("Delete this comment"),
+                        ],
                       ),
-                      Text("Delete this comment"),
-                    ],
-                  ),
-                  onTap: () {
-                    context.read<CommentService>().deleteComment(commentId);
-                    showFlushbar(
-                        context: context,
-                        message: "Comment was deleted successfully",
-                        color: Theme.of(context).primaryColor);
-                  },
-                ),
-              ];
-            }
-
-            return Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: 35,
-                  height: 35,
-                  child: CircleAvatar(backgroundImage: avatar),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        user.name,
-                        style: const TextStyle(
-                            fontSize: 15, fontWeight: FontWeight.bold),
+                      onTap: () {
+                        context.read<CommentService>().deleteComment(commentId);
+                        showFlushbar(
+                            context: context,
+                            message: "Comment was deleted successfully",
+                            color: Theme.of(context).primaryColor);
+                      },
+                    ),
+                  ];
+                }
+            
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: 35,
+                      height: 35,
+                      child: CircleAvatar(backgroundImage: avatar),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user.name,
+                            style: const TextStyle(
+                                fontSize: 15, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(
+                            height: 4,
+                          ),
+                          Text(
+                            comment.content,
+                            style: const TextStyle(fontSize: 15),
+                          ),
+                          Text(
+                            calculateCommentedTime(comment),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: Color.fromRGBO(0, 0, 0, 0.5),
+                            ),
+                          )
+                        ],
                       ),
-                      const SizedBox(
-                        height: 4,
-                      ),
-                      Text(
-                        comment.content,
-                        style: const TextStyle(fontSize: 15),
-                      ),
-                      Text(
-                        calculateCommentedTime(comment),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Color.fromRGBO(0, 0, 0, 0.5),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                PopupMenuButton(
-                  itemBuilder: (context) => popupMenuItems,
-                  icon: const Icon(Ionicons.ellipsis_vertical_outline),
-                  position: PopupMenuPosition.under,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
-                      side: const BorderSide(
-                        color: Colors.black12,
-                        width: 0.5,
-                      )),
-                  color: Colors.white,
-                  surfaceTintColor: Colors.white,
-                )
-              ],
+                    ),
+                    if(popupMenuItems.isNotEmpty) PopupMenuButton(
+                      itemBuilder: (context) => popupMenuItems,
+                      icon: const Icon(Ionicons.ellipsis_vertical_outline),
+                      position: PopupMenuPosition.under,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          side: const BorderSide(
+                            color: Colors.black12,
+                            width: 0.5,
+                          )),
+                      color: Colors.white,
+                      surfaceTintColor: Colors.white,
+                    )
+                  ],
+                );
+              },
             );
-          },
+          }
         ),
         const SizedBox(
           height: 15,

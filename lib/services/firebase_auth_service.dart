@@ -9,28 +9,32 @@ import 'package:flutter/services.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-Future<void> createUserDatabaseIfNewUser(UserCredential userCredential, [String? name, String? email]) async {
+Future<void> createUserDatabaseIfNewUser(UserCredential userCredential,
+    [String? name, String? email]) async {
   if (userCredential.user != null) {
     bool isNewUser = userCredential.additionalUserInfo!.isNewUser;
     final userDetails = userCredential.additionalUserInfo!.profile;
     final providerId = userCredential.additionalUserInfo?.providerId;
 
     String avatar = "";
-    switch(providerId) {
-      case "facebook.com": avatar = userDetails?["picture"]["data"]["url"];
-      case "google.com": avatar = userDetails?["picture"];
+    switch (providerId) {
+      case "facebook.com":
+        avatar = userDetails?["picture"]["data"]["url"];
+      case "google.com":
+        avatar = userDetails?["picture"];
     }
 
     if (isNewUser) {
       UserService().addUser(
-        User(
-          name: name ?? userDetails?["name"],
-          email: email ?? userDetails?["email"],
-          avatarUrl: avatar,
-          postsId: [],
-        ),
-        userCredential.user!.uid
-      );
+          User(
+            name: name ?? userDetails?["name"],
+            email: email ?? userDetails?["email"],
+            avatarUrl: avatar,
+            avatarFileName: "",
+            postsId: [],
+            biography: "",
+          ),
+          userCredential.user!.uid);
     }
   }
 }
@@ -179,8 +183,6 @@ class FirebaseAuthService {
             await _auth.signInWithCredential(facebookAuthCredential);
 
         createUserDatabaseIfNewUser(userCredential);
-        print(userCredential);
-
 
         Navigator.of(context).popUntil((route) => route.isFirst);
       }
