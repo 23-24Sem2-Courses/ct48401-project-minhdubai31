@@ -10,9 +10,11 @@ import 'package:ct484_project/ui/auth/auth_gate.dart';
 import 'package:ct484_project/ui/auth/login_screen.dart';
 import 'package:ct484_project/ui/auth/password_reset_screen.dart';
 import 'package:ct484_project/ui/auth/signup_screen.dart';
+import 'package:ct484_project/ui/screens/image_view_screen.dart';
 import 'package:ct484_project/ui/screens/user_personal_post_screen.dart';
 import 'package:ct484_project/ui/screens/create_edit_post_screen.dart';
 import 'package:ct484_project/ui/screens/user_profile_edit_screen.dart';
+import 'package:ct484_project/ui/screens/user_tab_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -57,7 +59,7 @@ class MyApp extends StatelessWidget {
         ),
         Provider<CommentService>(
           create: (ctx) => CommentService(),
-        )
+        ),
       ],
       // CHANGE THE COLOR OF STATUS BAR
       child: AnnotatedRegion<SystemUiOverlayStyle>(
@@ -82,9 +84,11 @@ class MyApp extends StatelessWidget {
             Object? args = settings.arguments;
             switch (routeName) {
               case UserPersonalPostScreen.routeName:
+                args as Map<String, Object>;
                 return MaterialPageRoute(
                   builder: (context) => UserPersonalPostScreen(
-                    selectedPostIndex: args as int,
+                    selectedPostIndex: args["selectedPostIndex"] as int,
+                    userId: args["userId"] as String,
                   ),
                 );
               case CreateEditPostScreen.routeName:
@@ -102,6 +106,16 @@ class MyApp extends StatelessWidget {
                 return MaterialPageRoute(
                   builder: (context) =>
                       UserProfileEditScreen(updateUser: args as User),
+                );
+              case ImageViewScreen.routeName:
+                return MaterialPageRoute(
+                  builder: (context) => ImageViewScreen(
+                    imageUrl: args as String,
+                  ),
+                );
+              case UserTabScreen.routeName:
+                return MaterialPageRoute(
+                  builder: (context) => UserTabScreen(userId: args as String),
                 );
               default:
                 return null;

@@ -1,7 +1,10 @@
 import 'package:ct484_project/ui/screens/user_tab_screen.dart';
 import 'package:ct484_project/ui/widgets/bottom_navigation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'home_tab_screen.dart';
+
+TabController? tabController;
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -12,12 +15,10 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
-  TabController? _tabController;
-
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -25,17 +26,24 @@ class _MainScreenState extends State<MainScreen>
     return Scaffold(
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-            border: Border(
-                top: BorderSide(color: Color.fromRGBO(220, 220, 220, 1)))),
+          border: Border(
+            top: BorderSide(
+              color: Color.fromRGBO(220, 220, 220, 1),
+            ),
+          ),
+        ),
         child: BottomNavigation(
-          tabController: _tabController!,
+          tabController: tabController!,
         ),
       ),
       body: TabBarView(
-        controller: _tabController,
-        children: const [
-          HomeTabScreen(),
-          UserTabScreen()
+        controller: tabController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          const HomeTabScreen(),
+          UserTabScreen(
+            userId: FirebaseAuth.instance.currentUser!.uid,
+          ),
         ],
       ),
     );

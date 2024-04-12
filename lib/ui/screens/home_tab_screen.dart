@@ -54,6 +54,7 @@ class _HomeTabScreenState extends State<HomeTabScreen>
                 }
 
                 return ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: posts.length,
                   itemBuilder: (context, index) {
                     Post post = posts[index].data();

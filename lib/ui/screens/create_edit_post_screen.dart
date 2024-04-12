@@ -174,25 +174,27 @@ class _CreateEditPostScreenState extends State<CreateEditPostScreen>
             children: [
               // AVATAR AND NAME
               StreamBuilder(
-                stream: context.read<UserService>().getUsers(),
-                builder: (context, snapshot) {
-                  return FutureBuilder(
-                    future: context
-                        .read<UserService>()
-                        .getUser(FirebaseAuth.instance.currentUser!.uid),
-                    builder: (context, snapshot) {
-                      User? user = snapshot.data?.data() as User?;
-                  
-                      if (user == null) {
-                        return const Center(
-                          child: null,
+                  stream: context.read<UserService>().getUsers(),
+                  builder: (context, snapshot) {
+                    return FutureBuilder(
+                      future: context
+                          .read<UserService>()
+                          .getUser(FirebaseAuth.instance.currentUser!.uid),
+                      builder: (context, snapshot) {
+                        User? user = snapshot.data?.data() as User?;
+
+                        if (user == null) {
+                          return const Center(
+                            child: null,
+                          );
+                        }
+                        return UserAvatarAndName(
+                          user: user,
+                          userId: FirebaseAuth.instance.currentUser!.uid,
                         );
-                      }
-                      return UserAvatarAndName(user: user);
-                    },
-                  );
-                }
-              ),
+                      },
+                    );
+                  }),
               const SizedBox(
                 height: 8,
               ),

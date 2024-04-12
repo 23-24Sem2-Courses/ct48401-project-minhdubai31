@@ -8,24 +8,32 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-class UserPersonalPostScreen extends StatelessWidget {
+class UserPersonalPostScreen extends StatefulWidget {
   static const routeName = "/user_personal_posts";
   UserPersonalPostScreen({
     super.key,
-    this.selectedPostIndex = 0,
+    this.selectedPostIndex = 0, required this.userId,
   });
   int selectedPostIndex;
+  final String userId;
 
   @override
+  State<UserPersonalPostScreen> createState() => _UserPersonalPostScreenState();
+}
+
+class _UserPersonalPostScreenState extends State<UserPersonalPostScreen>
+    with AutomaticKeepAliveClientMixin {
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Your posts"),
+        title: widget.userId == FirebaseAuth.instance.currentUser!.uid ? const Text("Your posts") : const Text("Posts"),
       ),
       body: StreamBuilder(
         stream: context
             .read<PostService>()
-            .getPostsOfUser(FirebaseAuth.instance.currentUser!.uid),
+            .getPostsOfUser(widget.userId),
         builder: (context, snapshot) {
           List posts = snapshot.data?.docs ?? [];
 
@@ -34,8 +42,9 @@ class UserPersonalPostScreen extends StatelessWidget {
           }
 
           return ScrollablePositionedList.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
             itemCount: posts.length,
-            initialScrollIndex: selectedPostIndex,
+            initialScrollIndex: widget.selectedPostIndex,
             itemBuilder: (context, index) {
               Post post = posts[index].data();
               return Column(
@@ -58,4 +67,8 @@ class UserPersonalPostScreen extends StatelessWidget {
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

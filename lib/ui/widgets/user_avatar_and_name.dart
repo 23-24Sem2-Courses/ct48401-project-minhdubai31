@@ -2,6 +2,8 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ct484_project/models/user.dart';
+import 'package:ct484_project/ui/screens/main_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 
@@ -12,9 +14,11 @@ class UserAvatarAndName extends StatefulWidget {
     this.popupMenuItems = const [],
     this.bigSize = false,
     this.time,
+    required this.userId,
   });
 
   final User user;
+  final String userId;
   bool bigSize;
   List<PopupMenuItem> popupMenuItems;
   String? time;
@@ -23,7 +27,8 @@ class UserAvatarAndName extends StatefulWidget {
   State<UserAvatarAndName> createState() => _UserAvatarAndNameState();
 }
 
-class _UserAvatarAndNameState extends State<UserAvatarAndName> with AutomaticKeepAliveClientMixin {
+class _UserAvatarAndNameState extends State<UserAvatarAndName>
+    with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -32,6 +37,7 @@ class _UserAvatarAndNameState extends State<UserAvatarAndName> with AutomaticKee
     if (widget.user.avatarUrl != "") {
       avatar = CachedNetworkImageProvider(widget.user.avatarUrl);
     }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: widget.bigSize
@@ -41,7 +47,9 @@ class _UserAvatarAndNameState extends State<UserAvatarAndName> with AutomaticKee
               children: [
                 Align(
                   alignment: Alignment.centerRight,
-                  child: UserPopupMenu(popupMenuItems: widget.popupMenuItems),
+                  child: widget.popupMenuItems.isNotEmpty
+                      ? UserPopupMenu(popupMenuItems: widget.popupMenuItems)
+                      : null,
                 ),
                 CircleAvatar(
                   radius: 40,
@@ -62,10 +70,11 @@ class _UserAvatarAndNameState extends State<UserAvatarAndName> with AutomaticKee
                 const SizedBox(
                   height: 4,
                 ),
-                widget.user.biography == ""
+                widget.user.biography == "" && widget.userId == FirebaseAuth.instance.currentUser!.uid
                     ? GestureDetector(
-                        onTap: () => Navigator.of(context)
-                            .pushNamed("/user_profile_edit", arguments: widget.user),
+                        onTap: () => Navigator.of(context).pushNamed(
+                            "/user_profile_edit",
+                            arguments: widget.user),
                         child: Text(
                           "Add biography",
                           style:
@@ -73,8 +82,8 @@ class _UserAvatarAndNameState extends State<UserAvatarAndName> with AutomaticKee
                         ),
                       )
                     : Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                      child: Text(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Text(
                           widget.user.biography,
                           style: const TextStyle(
                             fontSize: 13,
@@ -82,58 +91,70 @@ class _UserAvatarAndNameState extends State<UserAvatarAndName> with AutomaticKee
                           ),
                           textAlign: TextAlign.center,
                         ),
-                    ),
+                      ),
               ],
             )
 
           // FOR HOME TAB
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 38,
-                      height: 38,
-                      child: CircleAvatar(backgroundImage: avatar),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                      height: 45,
-                    ),
-                    widget.time != null
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                widget.user.name,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600, fontSize: 15),
-                              ),
-                              Text(
-                                widget.time!,
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  color: Color.fromRGBO(0, 0, 0, 0.5),
+          : GestureDetector(
+              onTap: () => {
+                if (widget.userId == FirebaseAuth.instance.currentUser!.uid)
+                  {tabController!.animateTo(1)}
+                else
+                  {
+                    Navigator.of(context)
+                        .pushNamed("/user_tab_screen", arguments: widget.userId)
+                  }
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 38,
+                        height: 38,
+                        child: CircleAvatar(backgroundImage: avatar),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                        height: 45,
+                      ),
+                      widget.time != null
+                          ? Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  widget.user.name,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 15),
                                 ),
-                              )
-                            ],
-                          )
-                        : Text(
-                            widget.user.name,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w600, fontSize: 15),
-                          )
-                  ],
-                ),
-                // POP UP MENU
-                if (widget.popupMenuItems.isNotEmpty)
-                  UserPopupMenu(popupMenuItems: widget.popupMenuItems),
-              ],
+                                Text(
+                                  widget.time!,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: Color.fromRGBO(0, 0, 0, 0.5),
+                                  ),
+                                )
+                              ],
+                            )
+                          : Text(
+                              widget.user.name,
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600, fontSize: 15),
+                            )
+                    ],
+                  ),
+                  // POP UP MENU
+                  if (widget.popupMenuItems.isNotEmpty)
+                    UserPopupMenu(popupMenuItems: widget.popupMenuItems),
+                ],
+              ),
             ),
     );
   }
-  
+
   @override
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;

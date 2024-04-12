@@ -50,7 +50,7 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
     if (selectedImage != null) {
       uploadedImage = await context
           .read<FirebaseStorageService>()
-          .uploadPostImage(selectedImage!);
+          .uploadAvatarImage(selectedImage!);
 
       // IF CURRENT AVATAR IMAGE FILE EXISTS IN FIREBASE STORAGE => DELETE
       if (widget.updateUser.avatarFileName.isNotEmpty) {
@@ -121,7 +121,9 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: Center(
+        child: SingleChildScrollView(
+          reverse: true,
+          physics: const AlwaysScrollableScrollPhysics(),
           child: Column(
             children: [
               const SizedBox(
@@ -193,7 +195,10 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
                 hintText: "Tell everyone something about you",
                 label: "Biography",
                 maxLines: 5,
-              )
+              ),
+              const SizedBox(
+                height: 12,
+              ),
             ],
           ),
         ),

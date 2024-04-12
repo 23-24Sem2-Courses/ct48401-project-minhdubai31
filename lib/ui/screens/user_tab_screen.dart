@@ -11,67 +11,86 @@ import 'package:provider/provider.dart';
 
 import '../widgets/post_preview_tile.dart';
 
-class UserTabScreen extends StatelessWidget {
-  const UserTabScreen({super.key});
+class UserTabScreen extends StatefulWidget {
+  static const routeName = "/user_tab_screen";
+  const UserTabScreen({super.key, required this.userId});
+  final String userId;
 
   @override
+  State<UserTabScreen> createState() => _UserTabScreenState();
+}
+
+class _UserTabScreenState extends State<UserTabScreen>
+    with AutomaticKeepAliveClientMixin {
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
+      appBar: widget.userId != FirebaseAuth.instance.currentUser!.uid
+          ? AppBar()
+          : null,
       body: SafeArea(
         child: Column(
           children: [
             // AVATAR AND NAME
             StreamBuilder(
-              stream: context.read<UserService>().getUsers(),
-              builder: (context, snapshot) {
-                return FutureBuilder(
-                  future: context
-                      .read<UserService>()
-                      .getUser(FirebaseAuth.instance.currentUser!.uid),
-                  builder: (context, snapshot) {
-                    User? user = snapshot.data?.data() as User?;
-                
-                    if (user == null) {
-                      return const Center(
-                        child: null,
+                stream: context.read<UserService>().getUsers(),
+                builder: (context, snapshot) {
+                  return FutureBuilder(
+                    future: context.read<UserService>().getUser(widget.userId),
+                    builder: (context, snapshot) {
+                      User? user = snapshot.data?.data() as User?;
+
+                      if (user == null) {
+                        return const Center(
+                          child: null,
+                        );
+                      }
+
+                      List<PopupMenuItem> popupMenuItems = [];
+                      if (widget.userId ==
+                          FirebaseAuth.instance.currentUser!.uid) {
+                        popupMenuItems = [
+                          PopupMenuItem(
+                            child: const Row(
+                              children: [
+                                Icon(Ionicons.cog_outline),
+                                SizedBox(
+                                  width: 20,
+                                ),
+                                Text("Edit profile"),
+                              ],
+                            ),
+                            onTap: () => Navigator.of(context).pushNamed(
+                                "/user_profile_edit",
+                                arguments: user),
+                          ),
+                          PopupMenuItem(
+                            child: const Row(
+                              children: [
+                                Icon(Ionicons.log_out_outline),
+                                SizedBox(
+                                  width: 20,
+                                ),
+                                Text("Sign out"),
+                              ],
+                            ),
+                            onTap: () => context
+                                .read<FirebaseAuthService>()
+                                .signOut(context: context),
+                          ),
+                        ];
+                      }
+
+                      return UserAvatarAndName(
+                        user: user,
+                        userId: widget.userId,
+                        bigSize: true,
+                        popupMenuItems: popupMenuItems,
                       );
-                    }
-                    return UserAvatarAndName(
-                      user: user,
-                      bigSize: true,
-                      popupMenuItems: [
-                        PopupMenuItem(
-                          child: const Row(
-                            children: [
-                              Icon(Ionicons.cog_outline),
-                              SizedBox(
-                                width: 20,
-                              ),
-                              Text("Edit profile"),
-                            ],
-                          ),
-                          onTap: () => Navigator.of(context).pushNamed("/user_profile_edit", arguments: user),
-                        ),
-                        PopupMenuItem(
-                          child: const Row(
-                            children: [
-                              Icon(Ionicons.log_out_outline),
-                              SizedBox(
-                                width: 20,
-                              ),
-                              Text("Sign out"),
-                            ],
-                          ),
-                          onTap: () => context
-                              .read<FirebaseAuthService>()
-                              .signOut(context: context),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              }
-            ),
+                    },
+                  );
+                }),
 
             const SizedBox(
               height: 30,
@@ -84,9 +103,8 @@ class UserTabScreen extends StatelessWidget {
 
             Expanded(
               child: StreamBuilder(
-                stream: context
-                    .read<PostService>()
-                    .getPostsOfUser(FirebaseAuth.instance.currentUser!.uid),
+                stream:
+                    context.read<PostService>().getPostsOfUser(widget.userId),
                 builder: (context, snapshot) {
                   List posts = snapshot.data?.docs ?? [];
 
@@ -100,7 +118,10 @@ class UserTabScreen extends StatelessWidget {
                     );
                   }
 
-                  return PostGridView(posts: posts);
+                  return PostGridView(
+                    posts: posts,
+                    userId: widget.userId,
+                  );
                 },
               ),
             ),
@@ -109,22 +130,27 @@ class UserTabScreen extends StatelessWidget {
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }
 
 class PostGridView extends StatelessWidget {
   const PostGridView({
     super.key,
     required this.posts,
+    required this.userId,
   });
 
   final List posts;
+  final String userId;
 
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
       itemCount: posts.length,
-      gridDelegate:
-          const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
         crossAxisSpacing: 4,
         mainAxisSpacing: 4,
@@ -133,8 +159,12 @@ class PostGridView extends StatelessWidget {
         Post post = posts[index].data();
         return GestureDetector(
             onTap: () => Navigator.of(context).pushNamed(
-                "/user_personal_posts",
-                arguments: index),
+                  "/user_personal_posts",
+                  arguments: {
+                    "selectedPostIndex": index,
+                    "userId": userId,
+                  },
+                ),
             child: PostPreviewTile(post: post));
       },
     );

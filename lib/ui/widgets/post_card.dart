@@ -107,15 +107,16 @@ class _PostCardState extends State<PostCard>
           future: userService.getUser(widget.post.ownerUserId),
           builder: (context, snapshot) {
             User? user = snapshot.data?.data() as User?;
-        
+
             if (user == null) {
               return const Center(
                 child: null,
               );
             }
-        
+
             List<PopupMenuItem> popupMenuItems = [];
-            if (FirebaseAuth.instance.currentUser!.uid == widget.post.ownerUserId) {
+            if (FirebaseAuth.instance.currentUser!.uid ==
+                widget.post.ownerUserId) {
               popupMenuItems = [
                 PopupMenuItem(
                   child: const Row(
@@ -157,18 +158,19 @@ class _PostCardState extends State<PostCard>
                 ),
               ];
             }
-        
+
             final post = widget.post;
             final postId = widget.postId;
             final likesUserIdList = post.likesUserIdList;
             final likesCount = likesUserIdList.length;
-        
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // AVATAR AND NAME
                 UserAvatarAndName(
                   user: user,
+                  userId: post.ownerUserId,
                   popupMenuItems: popupMenuItems,
                   time: calculatePostedTime(),
                 ),
@@ -177,6 +179,8 @@ class _PostCardState extends State<PostCard>
                 ),
                 GestureDetector(
                   onDoubleTap: likePost,
+                  onTap: () => Navigator.of(context)
+                      .pushNamed("/image_view", arguments: post.imageUrl),
                   child: Stack(
                     children: [
                       AspectRatio(
@@ -220,7 +224,7 @@ class _PostCardState extends State<PostCard>
                     ],
                   ),
                 ),
-        
+
                 // POST FOOTER
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -236,8 +240,8 @@ class _PostCardState extends State<PostCard>
                               children: [
                                 GestureDetector(
                                   onTap: toggleLike,
-                                  child: likesUserIdList.contains(
-                                          FirebaseAuth.instance.currentUser!.uid)
+                                  child: likesUserIdList.contains(FirebaseAuth
+                                          .instance.currentUser!.uid)
                                       ? Icon(
                                           Ionicons.heart,
                                           size: 30,
@@ -279,7 +283,7 @@ class _PostCardState extends State<PostCard>
                           )
                         ],
                       ),
-        
+
                       // POST CONTENT
                       Row(
                         children: [
@@ -303,18 +307,19 @@ class _PostCardState extends State<PostCard>
                               context: context, post: post, postId: postId);
                         },
                         child: StreamBuilder(
-                            stream: context
-                                .read<CommentService>()
-                                .getCommentsOfPost(postId),
-                            builder: (context, snapshot) {
-                              List comments = snapshot.data?.docs ?? [];
-                              return Text(
-                                "View ${comments.isEmpty ? '' : "all ${comments.length} "}comment${comments.length > 1 ? 's' : ''}",
-                                style: const TextStyle(
-                                    color: Color.fromRGBO(0, 0, 0, 0.4),
-                                    fontSize: 14),
-                              );
-                            }),
+                          stream: context
+                              .read<CommentService>()
+                              .getCommentsOfPost(postId),
+                          builder: (context, snapshot) {
+                            List comments = snapshot.data?.docs ?? [];
+                            return Text(
+                              "View ${comments.isEmpty ? '' : "all ${comments.length} "}comment${comments.length > 1 ? 's' : ''}",
+                              style: const TextStyle(
+                                  color: Color.fromRGBO(0, 0, 0, 0.4),
+                                  fontSize: 14),
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),
@@ -323,7 +328,7 @@ class _PostCardState extends State<PostCard>
             );
           },
         );
-      }
+      },
     );
   }
 
