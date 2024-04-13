@@ -53,7 +53,6 @@ class _CreateEditPostScreenState extends State<CreateEditPostScreen>
           Post(
             ownerUserId: FirebaseAuth.instance.currentUser!.uid,
             caption: caption,
-            totalLike: 0,
             imageUrl: uploadedImage["url"]!,
             imageFileName: uploadedImage["name"]!,
             likesUserIdList: [],
